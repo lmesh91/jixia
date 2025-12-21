@@ -27,6 +27,7 @@ def printContext : MetaM (Array Variable) := do
         name := name.simpMacroScopes,
         binderInfo? := some bi,
         type := (← ppExpr type).pretty,
+        typeExpr := type,
         value? := none,
         isProp := (← inferType type).isProp,
       }
@@ -40,6 +41,7 @@ def printContext : MetaM (Array Variable) := do
         name := name.simpMacroScopes,
         binderInfo? := none,
         type := (← ppExpr type).pretty,
+        typeExpr := type,
         value? := value,
         isProp := (← inferType type).isProp,
       }
@@ -58,6 +60,7 @@ def fromMVar (goal : MVarId) (extraFun : MVarId → MetaM (Option Json) := fun _
       context,
       mvarId := goal.name,
       type := (← ppTerm (← delab type)).pretty,
+      typeExpr := type,
       isProp := (← inferType type).isProp,
       extra?,
     }

@@ -111,8 +111,10 @@ def getTermInfo (ci : ContextInfo) (ti : TermInfo) : IO (Option TermElabInfo) :=
   ti.runMetaM ci <| withOptions setPPOptions try pure <| some {
     context := ← Goal.printContext
     type := (← ppExpr (← inferType ti.expr)).pretty
+    typeExpr := ← inferType ti.expr
     expectedType := ← ti.expectedType?.mapM fun type => do pure (← ppExpr type).pretty
     value := (← ppExpr ti.expr).pretty
+    valueExpr := ti.expr
     special? := getSpecialValue ti.expr
   } catch _ => pure none
 

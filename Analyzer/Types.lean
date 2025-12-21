@@ -106,6 +106,7 @@ structure Variable where
   name : Name
   binderInfo? : Option BinderInfo
   type : String
+  typeExpr : Expr
   value? : Option String
   isProp : Bool
 
@@ -114,6 +115,7 @@ structure Goal where
   context : Array Variable
   mvarId : Name
   type : String
+  typeExpr : Expr
   isProp : Bool
   extra? : Option Json := none
 
@@ -131,8 +133,10 @@ inductive SpecialValue where
 structure TermElabInfo where
   context : Array Variable
   type : String
+  typeExpr : Expr
   expectedType : Option String
   value : String
+  valueExpr : Expr
   special? : Option SpecialValue
 
 structure MacroInfo where

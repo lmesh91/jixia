@@ -75,6 +75,10 @@ instance : ToJson DeclarationInfo where
   | .ofInductive x => toJson x
 end
 
+instance : ToJson MData where
+  toJson _ := Json.null
+deriving instance ToJson for LevelMVarId, Level, Literal, Expr
+
 deriving instance ToJson for SymbolKind, SymbolInfo
 deriving instance ToJson for Variable, Goal
 
