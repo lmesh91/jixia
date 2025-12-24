@@ -77,7 +77,71 @@ end
 
 instance : ToJson MData where
   toJson _ := Json.null
-deriving instance ToJson for LevelMVarId, Level, Literal, Expr
+deriving instance ToJson for LevelMVarId, Level, Literal
+
+private partial def exprToJson : Expr → Json
+  | .bvar db => json% {
+      expr: "bvar",
+      deBrujinIndex: $(db)
+    }
+  | .fvar id => json% {
+      expr: "fvar",
+      id: $(id)
+    }
+  | .mvar id => json% {
+      expr: "mvar",
+      id: $(id)
+    }
+  | .sort lv => json% {
+      expr: "sort",
+      level: $(lv)
+    }
+  | .const name lvs => json% {
+      expr: "const",
+      name: $(name),
+      levels: $(lvs)
+    }
+  | .app fn arg => json% {
+      expr: "app",
+      fn: $(exprToJson fn),
+      arg: $(exprToJson arg)
+    }
+  | .lam bnm bty body binf => json% {
+      expr: "lam",
+      name: $bnm,
+      binderType: $(exprToJson bty),
+      body: $(exprToJson body),
+      binderInfo: $(binf)
+    }
+  | .forallE bnm bty body binf => json% {
+      expr: "forallE",
+      name: $bnm,
+      binderType: $(exprToJson bty),
+      body: $(exprToJson body),
+      binderInfo: $(binf)
+    }
+  | .letE name type val body nondep => json% {
+      expr: "letE",
+      name: $name,
+      type: $(exprToJson type),
+      value: $(exprToJson val),
+      body: $(exprToJson body),
+      nondep: $(nondep)
+    }
+  | .lit lit => json% {
+      expr: "lit",
+      value: $(lit)
+    }
+  | .mdata _ expr => exprToJson expr
+  | .proj name idx struct => json% {
+      expr: "proj",
+      name: $(name),
+      index: $(idx),
+      struct: $(exprToJson struct)
+    }
+
+instance : ToJson Expr where
+  toJson := exprToJson
 
 deriving instance ToJson for SymbolKind, SymbolInfo
 deriving instance ToJson for Variable, Goal

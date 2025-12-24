@@ -108,6 +108,7 @@ structure Variable where
   type : String
   typeExpr : Expr
   value? : Option String
+  valueExpr? : Option Expr
   isProp : Bool
 
 structure Goal where

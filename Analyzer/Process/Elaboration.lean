@@ -114,7 +114,7 @@ def getTermInfo (ci : ContextInfo) (ti : TermInfo) : IO (Option TermElabInfo) :=
     typeExpr := ← inferType ti.expr
     expectedType := ← ti.expectedType?.mapM fun type => do pure (← ppExpr type).pretty
     value := (← ppExpr ti.expr).pretty
-    valueExpr := ti.expr
+    valueExpr := ← instantiateMVars ti.expr
     special? := getSpecialValue ti.expr
   } catch _ => pure none
 
