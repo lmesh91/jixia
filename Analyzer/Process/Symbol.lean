@@ -40,15 +40,16 @@ def references (expr : Expr) : TermElabM (Array ConstInfo) := do
     match env.find? name with
     | some info =>
       let typeExpr := info.toConstantVal.type
+      let levels := info.toConstantVal.levelParams
       let typeOpt ← withOptions setPPOptions do
         try
           pure <| some (← ppExpr typeExpr).pretty
         catch _ => pure none
       let typeStr := typeOpt.getD typeExpr.dbgToString
-      pure { name := name, type? := some typeStr, typeExpr? := some typeExpr }
+      pure { name := name, type? := some typeStr, levels? := some levels, typeExpr? := some typeExpr }
     | none =>
       -- fallback: we couldn't find the declaration in the environment
-      pure { name := name, type? := none, typeExpr? := none }
+      pure { name := name, type? := none, levels? := none, typeExpr? := none }
 
 def ppType (type : Expr) : MetaM (Option String) :=
   tryCatchRuntimeEx (do

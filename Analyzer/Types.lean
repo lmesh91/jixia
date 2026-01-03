@@ -79,6 +79,7 @@ structure ConstInfo where
   name: Name
   type?: Option String
   typeExpr? : Option Expr
+  levels? : Option (List Name)
 
 inductive SymbolKind where
   | «axiom» : SymbolKind
