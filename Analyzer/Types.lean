@@ -74,6 +74,12 @@ def DeclarationInfo.toBaseDeclarationInfo : DeclarationInfo → BaseDeclarationI
   | .ofBase info => info
   | .ofInductive info => info.toBaseDeclarationInfo
 
+
+structure ConstInfo where
+  name: Name
+  type?: Option String
+  typeExpr? : Option Expr
+
 inductive SymbolKind where
   | «axiom» : SymbolKind
   | definition : SymbolKind
@@ -95,9 +101,9 @@ structure SymbolInfo where
   typeFallback : String
   /-- Names of constants that the type of this symbol references.  Mathematically, this roughly means "notions
   needed to state the theorem". -/
-  typeReferences : HashSet Name
+  typeReferences : Array ConstInfo
   /-- In the same spirit as above, "notions used in the proof of the theorem". `null` if this symbol has no value. -/
-  valueReferences : Option (HashSet Name)
+  valueReferences : Option (Array ConstInfo)
   /-- Whether the type of this symbol is a proposition. -/
   isProp : Bool
 

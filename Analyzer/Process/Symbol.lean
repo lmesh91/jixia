@@ -7,12 +7,12 @@ import Lean
 import Analyzer.Types
 import Analyzer.Process.Common
 
-open Lean Elab Term Command Frontend Parser
+open Lean Elab Term Command Frontend Parser Meta
 open Std (HashSet)
 
 namespace Analyzer.Process.Symbol
 
-def references (expr : Expr) : HashSet Name :=
+def references_set (expr : Expr) : HashSet Name :=
   go expr (.emptyWithCapacity, .emptyWithCapacity) |>.2.2
 where
   go (expr : Expr) : StateM (HashSet UInt64 × HashSet Name) Unit := do
@@ -32,6 +32,23 @@ where
       | .lit _ => pure ()
       | .mdata _ e => go e
       | .proj _ _ e => go e
+
+def references (expr : Expr) : TermElabM (Array ConstInfo) := do
+  let names := references_set expr |>.toArray
+  names.mapM fun name => do
+    let env ← getEnv
+    match env.find? name with
+    | some info =>
+      let typeExpr := info.toConstantVal.type
+      let typeOpt ← withOptions setPPOptions do
+        try
+          pure <| some (← ppExpr typeExpr).pretty
+        catch _ => pure none
+      let typeStr := typeOpt.getD typeExpr.dbgToString
+      pure { name := name, type? := some typeStr, typeExpr? := some typeExpr }
+    | none =>
+      -- fallback: we couldn't find the declaration in the environment
+      pure { name := name, type? := none, typeExpr? := none }
 
 def ppType (type : Expr) : MetaM (Option String) :=
   tryCatchRuntimeEx (do
@@ -60,8 +77,8 @@ def getSymbolInfo (name : Name) (info : ConstantInfo) : TermElabM SymbolInfo := 
   -- TODO: figure out why ppExpr returns fully expanded names even without any options
   let typeReadable ← ppType type
   let typeFallback := type.dbgToString
-  let typeReferences := references info.type
-  let valueReferences := info.value?.map references
+  let typeReferences ← references info.type
+  let valueReferences ← info.value?.mapM references
   return { kind, name, typeFull, typeReadable, typeFallback, typeReferences, valueReferences, isProp }
 
 def getResult (path : System.FilePath) : IO (Array SymbolInfo) := do

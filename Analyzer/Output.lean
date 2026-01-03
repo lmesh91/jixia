@@ -82,7 +82,7 @@ deriving instance ToJson for LevelMVarId, Level, Literal
 private partial def exprToJson : Expr → Json
   | .bvar db => json% {
       expr: "bvar",
-      deBrujinIndex: $(db)
+      deBruijnIndex: $(db)
     }
   | .fvar id => json% {
       expr: "fvar",
@@ -143,7 +143,7 @@ private partial def exprToJson : Expr → Json
 instance : ToJson Expr where
   toJson := exprToJson
 
-deriving instance ToJson for SymbolKind, SymbolInfo
+deriving instance ToJson for ConstInfo, SymbolKind, SymbolInfo
 deriving instance ToJson for Variable, Goal
 
 deriving instance ToJson for ModuleInfo
